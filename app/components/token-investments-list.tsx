@@ -1,84 +1,24 @@
 "use client";
 
-import { SiteConfigContracts } from "@/config/site";
+import { useEffect, useMemo } from "react";
+import { isAddressEqual, zeroAddress } from "viem";
+import { readContracts } from "wagmi";
 import EntityList from "./entity-list";
 import { TokenCard } from "./token-card";
-import { useEffect, useState } from "react";
-import { useAccount, useInfiniteReadContracts } from "wagmi";
-import { isAddressEqual, zeroAddress } from "viem";
-import { farmTokenAbi } from "@/contracts/abi/farmToken";
 
-const LIMIT = 42;
+// show requests for a given investor
 
-export function TokenInvestmentsList(props: {
-  contracts: SiteConfigContracts;
-}) {
-  const { address } = useAccount();
-  const [smartAccountAddress, setSmartAccountAddress] = useState<
-    `0x${string}` | undefined
-  >();
-  const [tokens, setTokens] = useState<string[] | undefined>();
-
-  const { data } = useInfiniteReadContracts({
-    cacheKey: `token_investments_list_${props.contracts.chain.id.toString()}`,
-    contracts(pageParam) {
-      return [...new Array(LIMIT)].map(
-        (_, i) =>
-          ({
-            address: props.contracts.farmToken,
-            abi: farmTokenAbi,
-            functionName: "getParams",
-            args: [BigInt(pageParam + i)],
-            chainId: props.contracts.chain.id,
-          } as const)
-      );
-    },
-    query: {
-      initialPageParam: 0,
-      getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
-        return lastPageParam + 1;
-      },
-    },
-  });
-
-  useEffect(() => {
-    setSmartAccountAddress(undefined);
-    if (address) {
-      if (props.contracts.accountAbstractionSuported) {
-        // TODO: Implement
-      } else {
-        setSmartAccountAddress(address);
-      }
-    }
-  }, [address, props.contracts]);
-
-  useEffect(() => {
-    setTokens(undefined);
-    if (address && data && smartAccountAddress) {
-      const tokens: string[] = [];
-      const dataFirstPage = (data as any).pages[0];
-      for (let i = 0; i < dataFirstPage.length; i++) {
-        const dataPageElement = dataFirstPage[i];
-        if (
-          isAddressEqual(
-            dataPageElement.result.investor || zeroAddress,
-            smartAccountAddress
-          )
-        ) {
-          tokens.push(String(i));
-        }
-      }
-      setTokens(tokens);
-    }
-  }, [address, data, smartAccountAddress]);
-
+interface TokenInvestmentProps {
+  requests: any;
+}
+export function TokenInvestmentsList({requests}: TokenInvestmentProps) {
   return (
     <EntityList
-      entities={tokens?.toReversed()}
+      entities={requests}
       renderEntityCard={(token, index) => (
-        <TokenCard key={index} token={token} contracts={props.contracts} />
+        <TokenCard key={index} token={token} />
       )}
-      noEntitiesText={`No tokens on ${props.contracts.chain.name} 😐`}
+      noEntitiesText={`No requests found 😐`}
       className="gap-6"
     />
   );

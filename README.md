@@ -1,8 +1,8 @@
-# AgroBased Africa
+# FarmAfrica Africa
 
 ## Empowering African agriculture through blockchain-based asset tokenization and investment
 
-AgroBased is a revolutionary platform that leverages blockchain technology to address critical challenges in African agriculture. By tokenizing agricultural assets, we aim to bridge the gap between African farmers and global investors, unlocking the vast potential of the continent's agricultural sector.
+FarmAfrica is a revolutionary platform that leverages blockchain technology to address critical challenges in African agriculture. By tokenizing agricultural assets, we aim to bridge the gap between African farmers and global investors, unlocking the vast potential of the continent's agricultural sector.
 
 ## Table of Contents
 
@@ -36,7 +36,7 @@ AgroBased is a revolutionary platform that leverages blockchain technology to ad
 - Node.js
 - IPFS
 - Chainlink
-- Base (Ethereum Layer 2 solution)
+- Request Network
 - Hardhat
 - OpenZeppelin
 - Web3.js
@@ -53,7 +53,7 @@ AgroBased is a revolutionary platform that leverages blockchain technology to ad
 
 1. Clone the repository:
    ```
-   git clone https://github.com/your-username/agrobased.git
+   git clone https://github.com/your-username/farmAfrica.git
    ```
 
 2. Navigate to the project directory:
@@ -68,7 +68,6 @@ AgroBased is a revolutionary platform that leverages blockchain technology to ad
 
 4. Create a `.env` file in the root directory and add the following variables:
    ```
-   NEXT_PUBLIC_PRIVY_APP_ID=""
    NEXT_PUBLIC_PINATA_JWT=""
    NEXT_PUBLIC_PINATA_GATEWAY=""
    ```
@@ -117,7 +116,7 @@ To run a local blockchain for testing:
 
 ## Contributing
 
-We welcome contributions to AgroBased! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) file for details on our code of conduct and the process for submitting pull requests.
+We welcome contributions to FarmAfrica! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) file for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
@@ -125,4 +124,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ---
 
-For more information, please visit our [website](https://agrobased.com) or contact us at info@agrobasedcom.
+For more information, please visit our [website](https://farmAfrica.com) or contact us at info@FarmAfrica.com

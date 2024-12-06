@@ -1,15 +1,7 @@
 "use client";
 
-import { SiteConfigContracts } from "@/config/site";
 import { addressToShortAddress } from "@/lib/converters";
-import { formatEther, isAddressEqual, zeroAddress } from "viem";
-import { useAccount } from "wagmi";
-import { TokenInvestDialog } from "./token-invest-dialog";
-import { TokenReturnInvestmentDialog } from "./token-return-investment-dialog";
-import { TokenSellDialog } from "./token-sell-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { FarmTokenMetadata } from "@/types/farm-token-metadata";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -18,100 +10,44 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { useEffect, useState } from "react";
-import { ipfsUriToHttpUri, loadJsonFromIpfs } from "@/lib/ipfs";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 interface TokenCardHeaderProps {
   token: string;
-  tokenMetadata: FarmTokenMetadata;
-  tokenOwner: `0x${string}`;
+  tokenMetadata: any;  
+  tokenOwner: any;
   tokenInvestmentAmount: string;
   tokenInvestmentTokenSymbol: string;
-  tokenInvestor: `0x${string}`;
+  tokenInvestor: any;
   tokenReturnAmount: string;
   tokenReturnDate: string;
   reputationScore: number;
-  contracts: SiteConfigContracts;
   onUpdate: () => void;
 }
 
-interface PassportData {
-  image: string;
-  name: string;
-  description: string;
-}
-
 export function TokenCardHeader(props: TokenCardHeaderProps): JSX.Element {
-  const { address } = useAccount();
-  const [passportData, setPassportData] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const loadPassportData = async () => {
-    if (!props.tokenMetadata.passportUri) return;
-
-    setIsLoading(true);
-    try {
-      const data = await ipfsUriToHttpUri(props.tokenMetadata.passportUri);
-      console.log(data);
-      setPassportData(data);
-    } catch (error) {
-      console.error("Failed to load passport:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  // Dummy function to simulate loading passport data (now omitted)
+  const loadPassportData = () => {
+    setIsLoading(false);  // Simulation: No actual data loading
   };
-
-  const isReturnButtonVisible =
-    props.tokenReturnDate === "0" &&
-    isAddressEqual(props.tokenOwner, address || zeroAddress);
-  const isInvestButtonVisible =
-    isAddressEqual(props?.tokenInvestor, zeroAddress) &&
-    !isAddressEqual(props.tokenOwner, address || zeroAddress);
-  const isSellButtonVisible =
-    props.tokenReturnDate === "0" &&
-    isAddressEqual(props.tokenInvestor, address || zeroAddress);
-
-  console.log(props.reputationScore);
 
   return (
     <div className="w-full flex flex-row gap-4">
-      <Avatar className="size-14">
-        <AvatarImage src="" alt="Icon" />
-        <AvatarFallback className="text-2xl bg-primary">
-          {props.tokenMetadata.category === "Cattle"
-            ? "🐂"
-            : props.tokenMetadata.category === "Grains"
-            ? "🌾"
-            : props.tokenMetadata.category === "Poultry"
-            ? "🐔"
-            : props.tokenMetadata.category === "Coffee"
-            ? "☕"
-            : "⭐"}
-        </AvatarFallback>
-      </Avatar>
-
       <div className="w-full flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <p className="text-xl font-bold">
             {props.tokenMetadata.category}
-            {isAddressEqual(props.tokenInvestor, zeroAddress) && (
+            {props.tokenInvestor === "0x0000000000000000000000000000000000000000" && (
               <span className="font-normal text-primary"> — Available</span>
             )}
-            {!isAddressEqual(props.tokenInvestor, zeroAddress) &&
-              props.tokenReturnDate === "0" && (
-                <span className="font-normal text-destructive">
-                  {" "}
-                  — Invested
-                </span>
-              )}
-            {!isAddressEqual(props.tokenInvestor, zeroAddress) &&
-              props.tokenReturnDate !== "0" && (
-                <span className="font-normal text-muted-foreground">
-                  {" "}
-                  — Closed
-                </span>
-              )}
+            {props.tokenReturnDate !== "0" && (
+              <span className="font-normal text-muted-foreground">
+                {" "}— Closed
+              </span>
+            )}
           </p>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Reputation:</span>
@@ -145,9 +81,7 @@ export function TokenCardHeader(props: TokenCardHeaderProps): JSX.Element {
           </div>
           <div className="flex flex-col gap-1 md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Identifier:</p>
-            <p className="text-sm break-all">
-              {props.tokenMetadata.identifier}
-            </p>
+            <p className="text-sm break-all">{props.tokenMetadata.identifier}</p>
           </div>
           <div className="flex flex-col gap-1 md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Created:</p>
@@ -159,89 +93,63 @@ export function TokenCardHeader(props: TokenCardHeaderProps): JSX.Element {
             <p className="text-sm text-muted-foreground">Farmer:</p>
             <div className="flex justify-center items-center gap-2">
               <a
-                href={`${props.contracts.chain.blockExplorers?.default?.url}/address/${props.tokenOwner}`}
+                href={`/address/${props.tokenOwner}`}
                 target="_blank"
                 className="text-sm break-all underline underline-offset-4">
                 {addressToShortAddress(props.tokenOwner)}
               </a>
-              {props.tokenMetadata.passportUri && (
-                <Dialog onOpenChange={(open) => open && loadPassportData()}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      View ID Card
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Farmer ID Card</DialogTitle>
-                    </DialogHeader>
-                    {isLoading ? (
-                      <div className="flex justify-center p-8">
-                        <Loader2 className="h-8 w-8 animate-spin" />
-                      </div>
-                    ) : passportData ? (
-                      <div className="space-y-4">
-                        <img
-                          src={passportData}
-                          alt="Farmer ID"
-                          className="w-full rounded-lg"
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-center text-muted-foreground">
-                        Failed to load ID card
-                      </p>
-                    )}
-                  </DialogContent>
-                </Dialog>
-              )}
+              <Dialog onOpenChange={(open) => open && loadPassportData()}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    View ID Card
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Farmer ID Card</DialogTitle>
+                  </DialogHeader>
+                  {isLoading ? (
+                    <div className="flex justify-center p-8">
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground">
+                      No ID card data available
+                    </p>
+                  )}
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
-          {/* Rest of the existing fields... */}
+          {/* Simplified Chain and Investment Details */}
           <div className="flex flex-col md:flex-row md:gap-3">
-            <p className="text-sm text-muted-foreground">Chain:</p>
-            <p className="text-sm break-all">{props.contracts.chain.name}</p>
+            {/* <p className="text-sm text-muted-foreground">Chain:</p>
+            <p className="text-sm break-all">{props.contracts.chain.name}</p> */}
           </div>
-
-          {/* Investment details... */}
           <div className="flex flex-col md:flex-row md:gap-3">
-            <p className="text-sm text-muted-foreground">
-              Required investment:
-            </p>
+            <p className="text-sm text-muted-foreground">Required investment:</p>
             <p className="text-sm break-all">
-              {formatEther(BigInt(props.tokenInvestmentAmount || 0))}{" "}
-              {props.tokenInvestmentTokenSymbol}
+              {props.tokenInvestmentAmount} {props.tokenInvestmentTokenSymbol}
             </p>
           </div>
           <div className="flex flex-col md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Expected return:</p>
             <p className="text-sm break-all">
-              {formatEther(
-                BigInt(props.tokenMetadata.expectedReturnAmount || 0)
-              )}{" "}
+              {props.tokenMetadata.expectedReturnAmount}{" "}
               {props.tokenInvestmentTokenSymbol}
             </p>
           </div>
-          <div className="flex flex-col md:flex-row md:gap-3">
-            <p className="text-sm text-muted-foreground">
-              Expected return period:
-            </p>
-            <p className="text-sm break-all">
-              {props.tokenMetadata.expectedReturnPeriod === "1m" && "1 month"}
-              {props.tokenMetadata.expectedReturnPeriod === "3m" && "3 months"}
-              {props.tokenMetadata.expectedReturnPeriod === "6m" && "4 months"}
-              {props.tokenMetadata.expectedReturnPeriod === "1y" && "1 year"}
-            </p>
-          </div>
+
+          {/* Simple Investor Display */}
           <div className="flex flex-col md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Investor:</p>
             <p className="text-sm break-all">
-              {isAddressEqual(props.tokenInvestor, zeroAddress) ? (
+              {props.tokenInvestor === "0x0000000000000000000000000000000000000000" ? (
                 "None"
               ) : (
                 <a
-                  href={`${props.contracts.chain.blockExplorers?.default?.url}/address/${props.tokenInvestor}`}
+                  href={`/address/${props.tokenInvestor}`}
                   target="_blank"
                   className="underline underline-offset-4">
                   {addressToShortAddress(props.tokenInvestor)}
@@ -249,44 +157,8 @@ export function TokenCardHeader(props: TokenCardHeaderProps): JSX.Element {
               )}
             </p>
           </div>
-          {props.tokenReturnAmount !== "0" && (
-            <div className="flex flex-col md:flex-row md:gap-3">
-              <p className="text-sm text-muted-foreground">Return:</p>
-              <p className="text-sm break-all">
-                {formatEther(BigInt(props.tokenReturnAmount || "0"))}{" "}
-                {props.tokenInvestmentTokenSymbol}
-              </p>
-            </div>
-          )}
-          {props.tokenReturnDate !== "0" && (
-            <div className="flex flex-col md:flex-row md:gap-3">
-              <p className="text-sm text-muted-foreground">Return date:</p>
-              <p className="text-sm break-all">
-                {new Date(
-                  Number(props.tokenReturnDate) * 1000 || 0
-                ).toLocaleString()}
-              </p>
-            </div>
-          )}
 
-          {isReturnButtonVisible && (
-            <TokenReturnInvestmentDialog
-              token={props.token}
-              tokenInvestmentTokenSymbol={props.tokenInvestmentTokenSymbol}
-              contracts={props.contracts}
-              onReturn={() => props.onUpdate()}
-            />
-          )}
-          {isInvestButtonVisible && (
-            <TokenInvestDialog
-              token={props.token}
-              tokenInvestmentAmount={props.tokenInvestmentAmount}
-              tokenInvestmentTokenSymbol={props.tokenInvestmentTokenSymbol}
-              contracts={props.contracts}
-              onInvest={() => props.onUpdate()}
-            />
-          )}
-          {isSellButtonVisible && <TokenSellDialog />}
+          {/* Optional: Remove investment, return buttons for simplicity */}
         </div>
       </div>
     </div>

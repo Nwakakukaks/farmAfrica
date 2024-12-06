@@ -7,15 +7,17 @@ import { Web3Provider } from "@/components/web3-provider";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
-import type { Metadata, Viewport } from "next";
+import "@rainbow-me/rainbowkit/styles.css";
 import { Inter as FontSans } from "next/font/google";
 
+// Initialize font configuration
 export const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-export const metadata: Metadata = {
+
+export const metadata = {
   title: `${siteConfig.name} — ${siteConfig.description}`,
   description: siteConfig.description,
   icons: {
@@ -23,18 +25,16 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
+// Viewport configuration
+export const viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
     { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+// Root layout component
+export default function RootLayout({ children }: {children: React.ReactNode}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head />

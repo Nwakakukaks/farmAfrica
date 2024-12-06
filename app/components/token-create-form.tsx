@@ -1,16 +1,10 @@
 "use client";
 
 import { siteConfig } from "@/config/site";
-import useError from "@/hooks/useError";
-import { uploadFileToIpfs, uploadJsonToIpfs } from "@/lib/ipfs";
-import { chainToSiteConfigContracts } from "@/lib/siteConfig";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { isAddress, parseEther } from "viem";
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "./ui/button";
 import {
@@ -30,19 +24,11 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
-import { toast } from "./ui/use-toast";
-import { farmTokenAbi } from "@/contracts/abi/farmToken";
-import { FarmTokenMetadata } from "@/types/farm-token-metadata";
 
 const MAX_FILE_SIZE = 5000000; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg"];
 
 export function TokenCreateForm() {
-  const { handleError } = useError();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
-  const { address, chainId } = useAccount();
-  const router = useRouter();
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
   const formSchema = z.object({
@@ -79,60 +65,23 @@ export function TokenCreateForm() {
     },
   });
 
-  // Fixed type errors in the form submission
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  // Just a dummy submit function (no smart contract interaction)
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsFormSubmitting(true);
-      const contracts = chainToSiteConfigContracts(values.chain);
 
-      if (!publicClient || !address || !walletClient) {
-        throw new Error("Client or wallet not ready");
-      }
-      if (chainId !== contracts.chain.id) {
-        throw new Error(`Connect to ${contracts.chain.name}`);
-      }
-
-      // Upload passport to IPFS first
-      const passportFile = values.passport[0];
-      const passportUri = await uploadFileToIpfs(passportFile);
-
-      const investmentAmount = parseEther(String(values.investmentAmount));
-      const metadata: FarmTokenMetadata = {
-        created: new Date().getTime(),
-        category: values.category,
-        description: values.description,
-        identifier: values.identifier,
-        expectedReturnAmount: parseEther(
-          String(values.expectedReturnAmount)
-        ).toString(),
-        expectedReturnPeriod: values.expectedReturnPeriod,
-        passportUri: passportUri, // Add passport URI to metadata
-        records: [],
-      };
-
-      const metadataUri = await uploadJsonToIpfs(metadata);
-
-      if (contracts.accountAbstractionSuported) {
-        // TODO: Implementation
-      } else {
-        const txHash = await walletClient.writeContract({
-          address: contracts.farmToken,
-          abi: farmTokenAbi,
-          functionName: "create",
-          args: [investmentAmount, metadataUri, false],
-          chain: contracts.chain,
-        });
-        await publicClient.waitForTransactionReceipt({ hash: txHash });
-      }
-
-      toast({ title: "Token created 👌" });
-      router.push("/farm");
-    } catch (error: any) {
-      handleError(error, true);
+      // Simulating form submission (this part would be replaced with actual logic)
+      console.log("Form submitted with values:", values);
+      
+      // Reset form and show success message
+      form.reset();
+      alert("Token created successfully!");
+    } catch (error) {
+      console.error("Form submission error:", error);
+    } finally {
       setIsFormSubmitting(false);
     }
-  }
-
+  };
 
   return (
     <Form {...form}>
@@ -212,7 +161,7 @@ export function TokenCreateForm() {
                     <SelectValue placeholder="Select a chain" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                {/* <SelectContent>
                   {Object.values(siteConfig.contracts).map(
                     (contracts, index) => (
                       <SelectItem
@@ -222,7 +171,7 @@ export function TokenCreateForm() {
                       </SelectItem>
                     )
                   )}
-                </SelectContent>
+                </SelectContent> */}
               </Select>
               <FormMessage />
             </FormItem>

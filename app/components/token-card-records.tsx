@@ -1,6 +1,5 @@
 "use client";
 
-import { SiteConfigContracts } from "@/config/site";
 import EntityList from "./entity-list";
 import { TokenAddRecordDialog } from "./token-add-record-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -14,10 +13,9 @@ import { useState } from "react";
 export function TokenCardRecords(props: {
   token: string;
   tokenMetadata: FarmTokenMetadata;
-  tokenOwner: `0x${string}`;
+  tokenOwner: any;
   tokenInvestmentTokenSymbol: string;
   tokenReturnDate: string;
-  contracts: SiteConfigContracts;
   onUpdate: () => void;
 }) {
   const { address } = useAccount();
@@ -66,7 +64,7 @@ export function TokenCardRecords(props: {
               <TokenAddRecordDialog
                 token={props.token}
                 tokenMetadata={props.tokenMetadata}
-                contracts={props.contracts}
+                
                 onAdd={() => props.onUpdate()}
               />
             </div>

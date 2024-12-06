@@ -1,44 +1,18 @@
-"use client";
-
-import { SiteConfigContracts } from "@/config/site";
-import useError from "@/hooks/useError";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { formatEther, parseEther } from "viem";
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import { z } from "zod";
-import { Button } from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
 import { useToast } from "./ui/use-toast";
-import { farmTokenAbi } from "@/contracts/abi/farmToken";
+import { Button } from "./ui/button";
+import { Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { Input } from "./ui/input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 export function TokenReturnInvestmentDialog(props: {
   token: string;
-  contracts: SiteConfigContracts;
   onReturn?: () => void;
 }) {
-  const { handleError } = useError();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
-  const { address, chainId } = useAccount();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
@@ -54,46 +28,32 @@ export function TokenReturnInvestmentDialog(props: {
     },
   });
 
+  // Mocked onSubmit function for simulating the return of investment
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsFormSubmitting(true);
+      
+      // Simulate return logic (no blockchain interaction)
+      console.log("Returning investment:", values.value);
 
-      if (!publicClient) {
-        throw new Error("Public client is not ready");
-      }
-      if (!address || !walletClient) {
-        throw new Error("Wallet is not connected");
-      }
-      if (chainId !== props.contracts.chain.id) {
-        throw new Error(`You need to connect to ${props.contracts.chain.name}`);
-      }
-
-      if (props.contracts.accountAbstractionSuported) {
-        // TODO: Implement
-      } else {
-        const { request: returnRequest } = await publicClient.simulateContract({
-          address: props.contracts.farmToken,
-          abi: farmTokenAbi,
-          functionName: "returnInvestment",
-          args: [BigInt(props.token)],
-          chain: props.contracts.chain,
-          account: address,
-          value: parseEther(String(values.value)),
-        });
-        const returnTxHash = await walletClient.writeContract(returnRequest);
-        await publicClient.waitForTransactionReceipt({
-          hash: returnTxHash,
-        });
-      }
-
+      // Show a success toast after simulating the "return"
       toast({
-        title: "Investment returned 👌",
+        title: `Successfully returned ${values.value} ETH to the investor 👌`,
       });
+
+      // Simulate the onReturn callback
       props.onReturn?.();
+
+      // Reset the form and close the dialog
       form.reset();
       setIsOpen(false);
-    } catch (error: any) {
-      handleError(error, true);
+    } catch (error) {
+      console.error("Error during investment return:", error);
+      toast({
+        title: "Investment return failed",
+        description: "An error occurred while returning the investment.",
+        variant: "destructive",
+      });
     } finally {
       setIsFormSubmitting(false);
     }

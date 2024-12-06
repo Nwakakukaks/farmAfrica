@@ -1,79 +1,42 @@
-import { SiteConfigContracts } from "@/config/site";
-import useError from "@/hooks/useError";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { formatEther, parseEther } from "viem";
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
-import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
-import { farmTokenAbi } from "@/contracts/abi/farmToken";
+import { Button } from "./ui/button";
+import { Loader2 } from "lucide-react";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 
 export function TokenInvestDialog(props: {
   token: string;
   tokenInvestmentAmount: string;
-  contracts: SiteConfigContracts;
   onInvest?: () => void;
 }) {
-  const { handleError } = useError();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
-  const { address, chainId } = useAccount();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
+  // Mocked onSubmit function for simulating an investment
   async function onSubmit() {
     try {
       setIsFormSubmitting(true);
-      // Check public client
-      if (!publicClient) {
-        throw new Error("Public client is not ready");
-      }
-      // Check wallet
-      if (!address || !walletClient) {
-        throw new Error("Wallet is not connected");
-      }
-      // Check chain
-      if (chainId !== props.contracts.chain.id) {
-        throw new Error(`You need to connect to ${props.contracts.chain.name}`);
-      }
+      // Simulate investment logic here (no blockchain interaction)
+      console.log("Investment submitted:", props.tokenInvestmentAmount);
 
-      // Send native token investment
-      if (props.contracts.accountAbstractionSuported) {
-        // TODO: Implement account abstraction
-      } else {
-        const { request: investRequest } = await publicClient.simulateContract({
-          address: props.contracts.farmToken,
-          abi: farmTokenAbi,
-          functionName: "makeInvestment",
-          args: [BigInt(props.token)],
-          chain: props.contracts.chain,
-          account: address,
-          value: parseEther(formatEther(BigInt(props.tokenInvestmentAmount))),
-        });
-        const investTxHash = await walletClient.writeContract(investRequest);
-        await publicClient.waitForTransactionReceipt({
-          hash: investTxHash,
-        });
-      }
-
-      // Show success message
+      // Simulated success message
       toast({
-        title: "Investment made 👌",
+        title: `Investment of ${props.tokenInvestmentAmount} ETH made 👌`,
       });
+
+      // Simulate the onInvest callback
       props.onInvest?.();
+
+      // Close the dialog after the "investment"
       setIsOpen(false);
-    } catch (error: any) {
-      handleError(error, true);
+    } catch (error) {
+      console.error("Error during investment:", error);
+      toast({
+        title: "Investment failed",
+        description: "An error occurred while making the investment.",
+        variant: "destructive",
+      });
     } finally {
       setIsFormSubmitting(false);
     }
@@ -90,8 +53,7 @@ export function TokenInvestDialog(props: {
         <AlertDialogHeader>
           <AlertDialogTitle>
             Are you sure you want to invest{" "}
-            {formatEther(BigInt(props.tokenInvestmentAmount || 0))} ETH in this
-            token?
+            {props.tokenInvestmentAmount} ETH in this token?
           </AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogFooter>

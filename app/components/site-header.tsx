@@ -3,7 +3,7 @@
 import { siteConfig } from "@/config/site";
 import Link from "next/link";
 import { useAccount } from "wagmi";
-import { SiteHeaderConnectButton } from "./site-header-connect-button";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
@@ -59,7 +59,16 @@ export function SiteHeader() {
           {/* Right Section - Theme Toggle & Connect Button */}
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            <SiteHeaderConnectButton />
+            <ConnectButton
+                  showBalance={{
+                    smallScreen: false,
+                    largeScreen: true,
+                  }}
+                  accountStatus={{
+                    smallScreen: "avatar",
+                    largeScreen: "full",
+                  }}
+                />
           </div>
         </div>
       </div>
