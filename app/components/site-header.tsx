@@ -16,7 +16,7 @@ export function SiteHeader() {
           {/* Left Section - Logo */}
           <div className="flex-none">
             <Link href="/" className="flex items-center space-x-2">
-              <span className="inline-block flex justify-center items-center font-bold ">
+              <span className="flex justify-center items-center font-bold ">
                 <span className="text-2xl">{siteConfig.emoji}</span>
 
                 <span className="hidden md:inline-block ml-2">

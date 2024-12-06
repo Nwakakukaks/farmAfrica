@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { addressToShortAddress } from "@/lib/converters";
@@ -12,64 +13,90 @@ import {
 } from "./ui/dialog";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { isAddressEqual, zeroAddress } from "viem";
+import { TokenInvestDialog } from "./token-invest-dialog";
+import { TokenReturnInvestmentDialog } from "./token-return-investment-dialog";
+import { TokenSellDialog } from "./token-sell-dialog";
+import { useAccount } from "wagmi";
+
+//showing funding request details
 
 interface TokenCardHeaderProps {
-  token: string;
-  tokenMetadata: any;  
-  tokenOwner: any;
-  tokenInvestmentAmount: string;
-  tokenInvestmentTokenSymbol: string;
-  tokenInvestor: any;
-  tokenReturnAmount: string;
-  tokenReturnDate: string;
-  reputationScore: number;
-  onUpdate: () => void;
+  token: any;
 }
 
-export function TokenCardHeader(props: TokenCardHeaderProps): JSX.Element {
+export function TokenCardHeader({ token }: TokenCardHeaderProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { address } = useAccount();
 
-  // Dummy function to simulate loading passport data (now omitted)
+  const {
+    type,
+    category,
+    description,
+    identifier,
+    chain,
+    investmentAmount,
+    expectedReturnAmount,
+    expectedReturnPeriod,
+    farmerAddress,
+    investorAddress,
+  } = token.contentData;
+
   const loadPassportData = () => {
-    setIsLoading(false);  // Simulation: No actual data loading
+    setIsLoading(false);
   };
+
+  const reputation_score = 70;
+
+  const isReturnButtonVisible =
+    farmerAddress && address && isAddressEqual(farmerAddress, address);
+
+  const isInvestButtonVisible =
+    investorAddress === "" &&
+    address &&
+    farmerAddress &&
+    !isAddressEqual(address, farmerAddress);
+
+  const isSellButtonVisible =
+    farmerAddress && address && isAddressEqual(farmerAddress, address);
 
   return (
     <div className="w-full flex flex-row gap-4">
       <div className="w-full flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <p className="text-xl font-bold">
-            {props.tokenMetadata.category}
-            {props.tokenInvestor === "0x0000000000000000000000000000000000000000" && (
+            {category}
+            {investorAddress === "" ? (
               <span className="font-normal text-primary"> — Available</span>
-            )}
-            {props.tokenReturnDate !== "0" && (
+            ) : (
               <span className="font-normal text-muted-foreground">
-                {" "}— Closed
+                {" "}
+                — Closed
               </span>
             )}
           </p>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Reputation:</span>
             <Progress
-              value={props.reputationScore}
+              value={reputation_score}
               className={`w-32 h-2 ${
-                props.reputationScore >= 70
+                reputation_score >= 70
                   ? "bg-green-200 [&>div]:bg-green-500"
-                  : props.reputationScore >= 50
+                  : reputation_score >= 50
                   ? "bg-yellow-200 [&>div]:bg-yellow-500"
                   : "bg-red-200 [&>div]:bg-red-500"
               }`}
             />
             <span
               className={`text-sm font-medium ${
-                props.reputationScore >= 70
+                reputation_score >= 70
                   ? "text-green-500"
-                  : props.reputationScore >= 50
+                  : reputation_score >= 50
                   ? "text-yellow-500"
                   : "text-red-500"
-              }`}>
-              {props.reputationScore}%
+              }`}
+            >
+              {reputation_score}%
             </span>
           </div>
         </div>
@@ -77,26 +104,27 @@ export function TokenCardHeader(props: TokenCardHeaderProps): JSX.Element {
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1 md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Description:</p>
-            <p className="text-sm">{props.tokenMetadata.description}</p>
+            <p className="text-sm">{description}</p>
           </div>
           <div className="flex flex-col gap-1 md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Identifier:</p>
-            <p className="text-sm break-all">{props.tokenMetadata.identifier}</p>
+            <p className="text-sm break-all">{identifier}</p>
           </div>
           <div className="flex flex-col gap-1 md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Created:</p>
             <p className="text-sm break-all">
-              {new Date(props.tokenMetadata.created || 0).toLocaleString()}
+              {new Date(token.timestamp * 1000).toLocaleDateString()}
             </p>
           </div>
           <div className="flex flex-col gap-1 items-center md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Farmer:</p>
             <div className="flex justify-center items-center gap-2">
               <a
-                href={`/address/${props.tokenOwner}`}
+                href={`/address/${farmerAddress}`}
                 target="_blank"
-                className="text-sm break-all underline underline-offset-4">
-                {addressToShortAddress(props.tokenOwner)}
+                className="text-sm break-all underline underline-offset-4"
+              >
+                {addressToShortAddress(farmerAddress)}
               </a>
               <Dialog onOpenChange={(open) => open && loadPassportData()}>
                 <DialogTrigger asChild>
@@ -113,9 +141,11 @@ export function TokenCardHeader(props: TokenCardHeaderProps): JSX.Element {
                       <Loader2 className="h-8 w-8 animate-spin" />
                     </div>
                   ) : (
-                    <p className="text-center text-muted-foreground">
-                      No ID card data available
-                    </p>
+                    <img
+                      src="https://utfs.io/f/PKy8oE1GN2J3vJO6NSxAmeTSnXHbfhYk8MFj6RCAl0B3E2pO"
+                      className="w-full h-full"
+                      alt="ID card"
+                    />
                   )}
                 </DialogContent>
               </Dialog>
@@ -124,20 +154,21 @@ export function TokenCardHeader(props: TokenCardHeaderProps): JSX.Element {
 
           {/* Simplified Chain and Investment Details */}
           <div className="flex flex-col md:flex-row md:gap-3">
-            {/* <p className="text-sm text-muted-foreground">Chain:</p>
-            <p className="text-sm break-all">{props.contracts.chain.name}</p> */}
+            <p className="text-sm text-muted-foreground">Chain:</p>
+            <p className="text-sm break-all">{chain}</p>
           </div>
           <div className="flex flex-col md:flex-row md:gap-3">
-            <p className="text-sm text-muted-foreground">Required investment:</p>
+            <p className="text-sm text-muted-foreground">
+              Required investment:
+            </p>
             <p className="text-sm break-all">
-              {props.tokenInvestmentAmount} {props.tokenInvestmentTokenSymbol}
+              {investmentAmount} {token.currency}
             </p>
           </div>
           <div className="flex flex-col md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Expected return:</p>
             <p className="text-sm break-all">
-              {props.tokenMetadata.expectedReturnAmount}{" "}
-              {props.tokenInvestmentTokenSymbol}
+              {expectedReturnAmount} {token.currency}
             </p>
           </div>
 
@@ -145,20 +176,27 @@ export function TokenCardHeader(props: TokenCardHeaderProps): JSX.Element {
           <div className="flex flex-col md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Investor:</p>
             <p className="text-sm break-all">
-              {props.tokenInvestor === "0x0000000000000000000000000000000000000000" ? (
+              {investorAddress === "" ? (
                 "None"
               ) : (
                 <a
-                  href={`/address/${props.tokenInvestor}`}
+                  href={`/address/${investorAddress}`}
                   target="_blank"
-                  className="underline underline-offset-4">
-                  {addressToShortAddress(props.tokenInvestor)}
+                  className="underline underline-offset-4"
+                >
+                  {addressToShortAddress(investorAddress)}
                 </a>
               )}
             </p>
           </div>
 
-          {/* Optional: Remove investment, return buttons for simplicity */}
+          {isReturnButtonVisible && (
+            <TokenReturnInvestmentDialog token={token} onReturn={() => {}} />
+          )}
+          {isInvestButtonVisible && (
+            <TokenInvestDialog token={token} onInvest={() => {}} />
+          )}
+          {isSellButtonVisible && <TokenSellDialog />}
         </div>
       </div>
     </div>

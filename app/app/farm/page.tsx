@@ -59,9 +59,16 @@ export default function FarmPage() {
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
           value: identityAddress,
         });
-        const requestDatas = requests.map((request) => request.getData());
+        const filteredRequests = requests
+        .map((request) => request.getData())
+        .filter((data) => {
+          return (
+            data?.contentData.type === "Funding-Request"
+          );
+        });
 
-        setRequests(requestDatas);
+      setRequests(filteredRequests);
+      
       } catch (error) {
         console.error("Error fetching requests:", error);
       }

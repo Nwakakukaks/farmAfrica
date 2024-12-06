@@ -36,9 +36,9 @@ export default function ExplorePage() {
 
       if (!selectedCurrency || !selectedStorageChain) {
         toast({
-          variant: 'destructive',
-          description: 'Currency or chain is missing!',
-          title: 'Chain or currency missing'
+          variant: "destructive",
+          description: "Currency or chain is missing!",
+          title: "Chain or currency missing",
         });
         return;
       }
@@ -52,14 +52,19 @@ export default function ExplorePage() {
           },
         });
 
-        const identityAddress = address;
+        const identityAddress = '0x7128AF8F5AA6abe92b5f9ba9545146027A995B16';
         const requests = await requestClient.fromIdentity({
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
           value: identityAddress,
         });
-        const requestDatas = requests.map((request) => request.getData());
+        const filteredRequests = requests
+          .map((request) => request.getData())
+          .filter((data) => {
+            return data?.contentData.type === "Funding-Request";
+          });
 
-        setRequests(requestDatas);
+        setRequests(filteredRequests);
+       
       } catch (error) {
         console.error("Error fetching requests:", error);
       }

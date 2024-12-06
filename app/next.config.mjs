@@ -11,6 +11,11 @@ const nextConfig = {
         hostname: "res.cloudinary.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "utfs.io", // Add Unsplash
+        pathname: "/f/**",
+      },
     ],
   },
 };

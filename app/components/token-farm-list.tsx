@@ -6,8 +6,6 @@ import { readContracts } from "wagmi";
 import EntityList from "./entity-list";
 import { TokenCard } from "./token-card";
 
-// show requests for a given farmer
-
 interface TokenFarmProps {
   requests: any;
 }

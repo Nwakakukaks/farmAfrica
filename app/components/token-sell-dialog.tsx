@@ -14,13 +14,13 @@ export function TokenSellDialog() {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="default" size="sm">
-          Sell token
+          Request Additional investment
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            This feature has not been implemented yet 😔
+            Coming soon..  🏗️. This feature is in-development
           </AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogFooter>

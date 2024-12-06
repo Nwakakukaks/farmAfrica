@@ -10,20 +10,20 @@ import { Button } from "./ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
-export function TokenCardRecords(props: {
-  token: string;
-  tokenMetadata: FarmTokenMetadata;
-  tokenOwner: any;
-  tokenInvestmentTokenSymbol: string;
-  tokenReturnDate: string;
-  onUpdate: () => void;
-}) {
+//implement showcasing request updates from farmer
+
+interface TokenRecordProps {
+  token: any;
+  request: any;
+}
+
+export function TokenCardRecords({ token, request }: TokenRecordProps) {
   const { address } = useAccount();
   const [isExpanded, setIsExpanded] = useState(false);
+  const { farmerAddress } = token.contentData;
 
   const isAddRecordButtonVisible =
-    props.tokenReturnDate === "0" &&
-    isAddressEqual(props.tokenOwner, address || zeroAddress);
+    address && isAddressEqual(farmerAddress, address || zeroAddress);
 
   const handleToggle = () => setIsExpanded(!isExpanded);
 
@@ -32,7 +32,8 @@ export function TokenCardRecords(props: {
       <Button
         variant="ghost"
         className="w-full flex justify-between items-center p-4 hover:bg-secondary/50"
-        onClick={handleToggle}>
+        onClick={handleToggle}
+      >
         <div className="flex items-center gap-4">
           <Avatar className="size-10">
             <AvatarImage src="" alt="Icon" />
@@ -48,25 +49,15 @@ export function TokenCardRecords(props: {
       {isExpanded && (
         <div className="p-4 border-t">
           <EntityList
-            entities={props.tokenMetadata.records || []}
+            entities={request || []}
             renderEntityCard={(record, index) => (
-              <TokenCardRecord
-                key={index}
-                records={[record]}
-                tokenMetadata={props.tokenMetadata}
-                tokenInvestmentTokenSymbol={props.tokenInvestmentTokenSymbol}
-              />
+              <TokenCardRecord key={index} records={[record]} />
             )}
             noEntitiesText="No records 😐"
           />
           {isAddRecordButtonVisible && (
             <div className="mt-4">
-              <TokenAddRecordDialog
-                token={props.token}
-                tokenMetadata={props.tokenMetadata}
-                
-                onAdd={() => props.onUpdate()}
-              />
+              <TokenAddRecordDialog token={token} />
             </div>
           )}
         </div>
@@ -75,18 +66,7 @@ export function TokenCardRecords(props: {
   );
 }
 
-interface Record {
-  date: number;
-  value: string;
-}
-
-interface TokenCardRecordProps {
-  records: Record[];
-  tokenMetadata?: FarmTokenMetadata;
-  tokenInvestmentTokenSymbol?: string;
-}
-
-export function TokenCardRecord({ records }: TokenCardRecordProps) {
+export function TokenCardRecord({ records }: any) {
   const sortedRecords = [...records].sort((a, b) => b.date - a.date);
 
   return (
@@ -95,13 +75,9 @@ export function TokenCardRecord({ records }: TokenCardRecordProps) {
         <div key={index} className="border-l-2 border-primary pl-4 py-2">
           <div className="flex flex-col gap-1">
             <p className="text-sm text-muted-foreground">
-              {new Date(record.date).toLocaleString()}
+              {new Date(record.timestamp).toLocaleString()}
             </p>
-            <p className="text-base">
-              {record.value.startsWith("$")
-                ? record.value
-                : `${record.value} ETH`}
-            </p>
+            <p className="text-base">{record.contentData.record}</p>
           </div>
         </div>
       ))}

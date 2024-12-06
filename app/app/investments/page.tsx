@@ -28,7 +28,26 @@ export default function InvestmentsPage() {
   });
 
   useEffect(() => {
-    const fetchAllRequests = async () => {
+    const checkRequestCompletion = async (
+      requestClient: any, 
+      request: any
+    ): Promise<boolean> => {
+      try {
+        const fullRequest = await requestClient.fromRequestId(request.requestId);
+        const requestData = fullRequest.getData();
+
+        // Check if the request is fully funded
+        return (
+          requestData.balance?.balance !== undefined &&
+          parseFloat(requestData.balance.balance) >= parseFloat(requestData.expectedAmount)
+        );
+      } catch (error) {
+        console.error(`Error checking request ${request.requestId}:`, error);
+        return false;
+      }
+    };
+
+    const fetchCompletedRequests = async () => {
       if (!address) return;
 
       const selectedCurrency = currencies.get(currency);
@@ -36,9 +55,9 @@ export default function InvestmentsPage() {
 
       if (!selectedCurrency || !selectedStorageChain) {
         toast({
-          variant: 'destructive',
-          description: 'Currency or chain is missing!',
-          title: 'Chain or currency missing'
+          variant: "destructive",
+          description: "Currency or chain is missing!",
+          title: "Chain or currency missing",
         });
         return;
       }
@@ -57,19 +76,36 @@ export default function InvestmentsPage() {
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
           value: identityAddress,
         });
-        const requestDatas = requests.map((request) => request.getData());
+        
+        // Filter for funding requests
+        const fundingRequests = requests
+          .map((request) => request.getData())
+          .filter((data: any) => 
+            data?.contentData?.type === "Funding-Request"
+          );
 
-        setRequests(requestDatas);
+        // Check and collect completed requests
+        const completed: any[] = [];
+        for (const request of fundingRequests) {
+          const isFullyCompleted = await checkRequestCompletion(requestClient, request);
+          if (isFullyCompleted) {
+            completed.push(request);
+          }
+        }
+
+        setRequests(completed);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching requests:", error);
+        setIsLoading(false);
       }
     };
 
-    fetchAllRequests();
+    fetchCompletedRequests();
   }, [address]);
 
   return (
-    <div className="container py-10 lg:px-80">
+    <div className="container py-10 mx-auto">
       <div className="space-y-0.5">
         <h2 className="text-2xl font-bold tracking-tight">My investments</h2>
         <p className="text-muted-foreground">
