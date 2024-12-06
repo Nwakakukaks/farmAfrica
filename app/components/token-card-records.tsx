@@ -75,7 +75,7 @@ export function TokenCardRecord({ records }: any) {
         <div key={index} className="border-l-2 border-primary pl-4 py-2">
           <div className="flex flex-col gap-1">
             <p className="text-sm text-muted-foreground">
-              {new Date(record.timestamp).toLocaleString()}
+              {new Date(record.timestamp * 1000).toLocaleString()}
             </p>
             <p className="text-base">{record.contentData.record}</p>
           </div>
