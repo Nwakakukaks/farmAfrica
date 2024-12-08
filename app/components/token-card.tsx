@@ -73,7 +73,7 @@ export function TokenCard({ token }: TokenCardProps) {
           .filter((data) => {
             return (
               data?.contentData.type === "Funding-Record" &&
-              data?.contentData.identifier === token.contentData.identfier
+              data?.contentData.identifier === token.contentData.identifier
             );
           });
 

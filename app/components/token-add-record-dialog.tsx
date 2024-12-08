@@ -36,6 +36,7 @@ import { currencies } from "@/hooks/currency";
 import { storageChains } from "@/hooks/storage-chain";
 
 export function TokenAddRecordDialog(props: { token: any }) {
+ 
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);

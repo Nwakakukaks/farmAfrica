@@ -18,7 +18,7 @@ export default function LandingPage() {
           <div className="flex flex-row gap-4 mt-6">
             <Link href="/farm">
               <Button variant="default" size="lg">
-                Tokenize Your Farm
+                Request Financing
               </Button>
             </Link>
             <Link href="/explore">
@@ -125,7 +125,7 @@ export default function LandingPage() {
             </div>
             <div className="aspect-[3/2] relative overflow-hidden rounded-lg">
               <Image
-                src="https://res.cloudinary.com/dgbreoalg/image/upload/v1729425137/kk-transformed_fh3fwa.webp"
+                src="https://utfs.io/f/PKy8oE1GN2J3Y1ohXaj2v5fQiBSJGIMzDyA8UjRNs69HrewK"
                 alt="Cost of Inaction in African Agriculture"
                 layout="fill"
                 objectFit="cover"
@@ -182,17 +182,15 @@ export default function LandingPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
           <div className="text-center border p-4 rounded-md ">
-            <h3 className="text-2xl font-semibold mb-4">1. Tokenize</h3>
+            <h3 className="text-2xl font-semibold mb-4">1. Financing</h3>
             <p className="text-base">
-              African farmers tokenize their crops and livestock on our secure
-              blockchain platform.
+              African farmers request financing for their crops and livestock powered by Request Network.
             </p>
           </div>
           <div className="text-center border  p-4 rounded-md">
             <h3 className="text-2xl font-semibold mb-4">2. Invest</h3>
             <p className="text-base">
-              Global investors purchase tokens representing shares in African
-              agricultural projects.
+              Global investors invest in top projects by paying requests and owes shares of the project. 
             </p>
           </div>
           <div className="text-center border  p-4 rounded-md">
@@ -213,7 +211,7 @@ export default function LandingPage() {
         <div className="flex justify-center gap-4">
           <Link href="/farm">
             <Button variant="default" size="lg">
-              Tokenize Your Farm
+              Request Financing
             </Button>
           </Link>
           <Link href="/explore">

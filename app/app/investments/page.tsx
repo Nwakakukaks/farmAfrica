@@ -109,7 +109,7 @@ export default function InvestmentsPage() {
       <div className="space-y-0.5">
         <h2 className="text-2xl font-bold tracking-tight">My investments</h2>
         <p className="text-muted-foreground">
-          Tokenized crops and livestock in which you invested
+          Crops and livestock you invested in.
         </p>
       </div>
       <Separator className="my-6" />

@@ -82,13 +82,13 @@ export default function FarmPage() {
       <div className="space-y-0.5">
         <h2 className="text-2xl font-bold tracking-tight">My Farm</h2>
         <p className="text-muted-foreground">
-          Crops and livestock you tokenized to attract investments
+          Crops and livestock financing requests you&apos;ve made
         </p>
       </div>
       <Separator className="my-6" />
       <div className="flex flex-col items-start gap-6">
         <Link href="/farm/tokens/new">
-          <Button>Create Token</Button>
+          <Button>New Request</Button>
         </Link>
         <div className="w-full flex flex-col gap-6">
           {requests.map((request, index) => (

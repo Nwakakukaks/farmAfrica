@@ -40,13 +40,14 @@ export function TokenCardHeader({ token }: TokenCardHeaderProps) {
     expectedReturnPeriod,
     farmerAddress,
     investorAddress,
+    passport,
   } = token.contentData;
 
   const loadPassportData = () => {
     setIsLoading(false);
   };
 
-  const reputation_score = 70;
+  const reputation_score = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
 
   const isReturnButtonVisible =
     farmerAddress && address && isAddressEqual(farmerAddress, address);
@@ -65,7 +66,15 @@ export function TokenCardHeader({ token }: TokenCardHeaderProps) {
       <div className="w-full flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <p className="text-xl font-bold">
-            {category}
+            {category === "Grains"
+              ? "🌾 Grains"
+              : category === "Cattle"
+              ? "🐄 Cattle"
+              : category === "Poultry"
+              ? "🐓 Poultry"
+              : category === "Coffee"
+              ? "☕ Coffee"
+              : category}
             {investorAddress === "" ? (
               <span className="font-normal text-primary"> — Available</span>
             ) : (
@@ -104,7 +113,7 @@ export function TokenCardHeader({ token }: TokenCardHeaderProps) {
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1 md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Description:</p>
-            <p className="text-sm">{description}</p>
+            <p className="text-sm line-clamp-3">{description}</p>
           </div>
           <div className="flex flex-col gap-1 md:flex-row md:gap-3">
             <p className="text-sm text-muted-foreground">Identifier:</p>
@@ -140,9 +149,15 @@ export function TokenCardHeader({ token }: TokenCardHeaderProps) {
                     <div className="flex justify-center p-8">
                       <Loader2 className="h-8 w-8 animate-spin" />
                     </div>
-                  ) : (
+                  ) : Object.keys(passport).length === 0 ? (
                     <img
                       src="https://utfs.io/f/PKy8oE1GN2J3vJO6NSxAmeTSnXHbfhYk8MFj6RCAl0B3E2pO"
+                      className="w-full h-full"
+                      alt="ID card"
+                    />
+                  ) : (
+                    <img
+                      src={passport}
                       className="w-full h-full"
                       alt="ID card"
                     />

@@ -51,7 +51,9 @@ export function TokenCardRecords({ token, request }: TokenRecordProps) {
           <EntityList
             entities={request || []}
             renderEntityCard={(record, index) => (
-              <TokenCardRecord key={index} records={[record]} />
+              <div className="flex flex-col gap-2">
+                <TokenCardRecord key={index} records={[record]} />
+              </div>
             )}
             noEntitiesText="No records 😐"
           />
@@ -67,13 +69,13 @@ export function TokenCardRecords({ token, request }: TokenRecordProps) {
 }
 
 export function TokenCardRecord({ records }: any) {
-  const sortedRecords = [...records].sort((a, b) => b.date - a.date);
+  const sortedRecords = [...records].sort((a, b) => b.timestamp - a.timestamp);
 
   return (
     <div className="space-y-4">
       {sortedRecords.map((record, index) => (
         <div key={index} className="border-l-2 border-primary pl-4 py-2">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col">
             <p className="text-sm text-muted-foreground">
               {new Date(record.timestamp * 1000).toLocaleString()}
             </p>

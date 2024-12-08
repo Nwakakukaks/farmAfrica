@@ -78,7 +78,7 @@ export default function ExplorePage() {
       <div className="space-y-0.5">
         <h2 className="text-2xl font-bold tracking-tight">Explore</h2>
         <p className="text-muted-foreground">
-          Invest in tokenized crops and livestock that you like
+          Invest in crops and livestock that you like
         </p>
       </div>
       <Separator className="my-6" />

@@ -37,19 +37,18 @@ import { currencies } from "@/hooks/currency";
 import { storageChains } from "@/hooks/storage-chain";
 import axios from "axios";
 
-const MAX_FILE_SIZE = 5000000; // 5MB
+const MAX_FILE_SIZE = 10000000; // 10MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 
-const CLOUD_NAME = "your_cloud_name";
-const UPLOAD_PRESET = "your_upload_preset";
-const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
+const CLOUD_NAME = "dgz4c3ahz";
+const UPLOAD_PRESET = "mont_uploads";
+const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
-const uploadToCloudinary = async (file: File) => {
+const uploadToCloudinary = async (file: any) => {
   try {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", UPLOAD_PRESET);
-    formData.append("resource_type", "raw");
 
     const response = await axios.post(CLOUDINARY_URL, formData);
     return response.data.url;
@@ -162,6 +161,8 @@ export function TokenCreateForm() {
 
     setIsFormSubmitting(true);
 
+
+
     try {
       const signatureProvider = new Web3SignatureProvider(walletClient);
       const requestClient = new RequestNetwork({
@@ -170,6 +171,8 @@ export function TokenCreateForm() {
         },
         signatureProvider,
       });
+
+      const passportUrl = await uploadToCloudinary(values.passport[0]);
 
       const requestCreateParameters: Types.ICreateRequestParameters = {
         requestInfo: {
@@ -207,7 +210,7 @@ export function TokenCreateForm() {
           investmentAmount: values.investmentAmount,
           expectedReturnAmount: values.expectedReturnAmount.toString(),
           expectedReturnPeriod: values.expectedReturnPeriod,
-          passport: values.passport[0], 
+          passport: passportUrl,
           farmerAddress: address,
           investorAddress: '',
         },
@@ -226,6 +229,18 @@ export function TokenCreateForm() {
         title: "Request Created",
         description: `Request ID: ${confirmedRequestData.requestId}`,
         variant: "default",
+      });
+
+      form.reset({
+        category: undefined,
+        description: "",
+        identifier: "",
+        chain: storageChain,
+        currency: currency,
+        investmentAmount: 0,
+        expectedReturnAmount: 0,
+        expectedReturnPeriod: undefined,
+        passport: undefined,
       });
 
       setIsFormSubmitting(false);
